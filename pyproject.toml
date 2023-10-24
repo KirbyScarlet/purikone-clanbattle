@@ -1,0 +1,24 @@
+[project]
+name = "nonebot-plugin-purikone-clanbattle"
+version = "0.1.1"
+description = "NoneBot2 plugin for Princess Connect Clan Battle"
+authors = [
+    { name = "KirbyScarlet", email = "KirbySSU@outlook.com" },
+]
+dependencies = [
+    "nonebot2>=2.0.0rc3",
+    "aiohttp",
+    "pydantic",
+    "aiofiles",
+    "pathlib",
+    "asyncio",
+]
+requires-python = ">=3.8"
+readme = "README.md"
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/KirbyScarlet/nonebot_plugin_purikone_clanbattle"
+Repository = "https://github.com/KirbyScarlet/nonebot_plugin_purikone_clanbattle"
