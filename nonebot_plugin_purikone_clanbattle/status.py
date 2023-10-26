@@ -44,6 +44,12 @@ async def _status(group_id: str):
         else:
             maxhp = list(await dbclient.execute_fetchall(f"SELECT boss{i} FROM purikone_clanbattle_settings where chapter='{await get_chapter(b[0][1])}';"))[0][0]
             st.append(f"==========\n{b[0][1]}-{b[0][2]}: {b[0][3]} / {maxhp}")
+            _tree = list(await dbclient.execute_fetchall(f"SELECT nickname,tree,info FROM purikone_clanbattle_tree_{group_id} WHERE bossid={i};"))
+            for t in _tree:
+                if t[1] == 1:
+                    st.append(f"{t[0]} 已挂树 {t[2]}")
+                else:
+                    st.append(f"{t[0]} 正在挑战")
     
     title = "今日已出{count}刀\n"
 

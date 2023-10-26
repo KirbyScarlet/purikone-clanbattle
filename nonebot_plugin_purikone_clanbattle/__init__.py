@@ -10,14 +10,14 @@ __plugin_meta__ = PluginMetadata(
 ''',
 )
 
+from .status import _handle_status
 from .calc import _pair
 from .reserve import _reservation
 from .report import _handle_report, _handle_end_report
-from .apply import _apply
-from .tree import _tree, _check_tree, _cancel_tree
+from .apply import _handle_apply
+from .tree import _handle_tree, _handle_check_tree, _handle_cancel_tree
 from .settings import _handle_settings
 from .create import _create
-from .status import _handle_status
 
 from .utils import dbclient
 

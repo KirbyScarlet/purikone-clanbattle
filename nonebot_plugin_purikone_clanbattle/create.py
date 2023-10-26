@@ -38,19 +38,12 @@ CREATE TABLE purikone_clanbattle_settings(
     boss5 TEXT
 );
 """)
-    # 申请出刀表 用户id 周目 几王 是否是补偿 额外文字信息
-    await dbclient.execute(f"""\
-CREATE TABLE purikone_clanbattle_apply_{groupid}(
-    user TEXT,
-    turn TEXT,
-    boss INTEGER,
-    extra INTEGER,
-    info TEXT
-);""")
     # 挂树表 用户id 几王 刀型是否补偿刀 额外文字信息
     await dbclient.execute(f"""\
 CREATE TABLE purikone_clanbattle_tree_{groupid}(
     user TEXT,
+    nickname TEXT,
+    tree INTEGER,
     bossid INTEGER,
     extra INTEGER,
     info TEXT
@@ -64,7 +57,7 @@ CREATE TABLE purikone_clanbattle_status_{groupid}(
     bosshp INTEGER,
     user TEXT
 );""")
-    # 刀手出刀记录表 日期 刀手 周目 几王 伤害 是否尾刀
+    # 刀手出刀记录表 日期 刀手 周目 几王 伤害 是否收尾刀 是否是尾刀造成的伤害
     await dbclient.execute(f"""\
 CREATE TABLE purikone_clanbattle_history_{groupid}(
     date INTEGER,
@@ -72,12 +65,14 @@ CREATE TABLE purikone_clanbattle_history_{groupid}(
     turn INTEGER,
     bossid INTEGER,
     damage INTEGER,
+    end INTEGER,
     extra, INTEGER
 );""")
     # 预约表 刀手 周目 几王 额外文字信息
     await dbclient.execute(f"""\
 CREATE TABLE purikone_clanbattle_reserve_{groupid}(
     user TEXT,
+    nickname TEXT,
     turn INTEGER,
     bossid INTEGER,
     info TEXT
