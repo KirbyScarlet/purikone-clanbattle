@@ -3,7 +3,6 @@
 import re
 from decimal import Decimal
 import aiosqlite
-import asyncio
 import pathlib
 from nonebot.adapters import Bot, Event
 from nonebot.rule import Rule
@@ -12,21 +11,13 @@ import asyncio
 
 from .config import purikone_config
 
+from . import sqliteapi
+
 __all__ = [
     "dbclient",
     "sint",
     "check_bot"
 ]
-
-###########################
-# 数据库连接
-
-if not pathlib.Path("data/purikone").exists():
-    pathlib.Path("data/purikone").mkdir(parents=True, exist_ok=True)
-
-DB_PATH = "data/purikone/purikone_clanbattle.db"
-
-dbclient = asyncio.run(aiosqlite.connect(DB_PATH).__aenter__())
 
 ###########################
 # 中文习惯的伤害值转换
