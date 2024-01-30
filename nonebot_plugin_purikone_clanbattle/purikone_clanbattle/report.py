@@ -103,7 +103,8 @@ async def report(group_id: str, user_id: str, args: Namespace):
     _t, _b, _c, _n = await on_tree(group_id, user_id)
     if not (_b or args.n):
         return [{"text":"\n请先 申请出刀 或 指定首领编号报刀\n"+REPORT_HELP}]
-    if _b and int(args.n) != _b:
+    logger.info(f"{_b}")
+    if _b and args.n and int(args.n) != int(_b):
         res.append({"text": "您报刀首领与申请首领不一致，以当前命令获取的首领编号执行后续操作\n"})
     boss_id = (args.n or _b)
     # 检查持否持有补偿刀
@@ -114,7 +115,7 @@ async def report(group_id: str, user_id: str, args: Namespace):
     try:
         damage = sint(args.damage).value
     except ValueError:
-        return [{"text": "伤害数值格式错误\n数值格式：\n  数字，数字w，数字e\n  20000000，2000w，0.2e"}]
+        return [{"text": "伤害数值格式错误\n数值格式：\n  数字，数字k，数字w，数字e\n  20000000，2000w，2kw，0.2e"}]
     # 检查当前boss是否可挑战
     bosshp = await get_currenthp(group_id, (args.n or _b))
     if bosshp == 0:
@@ -128,7 +129,7 @@ async def report(group_id: str, user_id: str, args: Namespace):
     await update_history(group_id, boss_id, user_id, turn, damage, 0, int(bool(args.b)))
 
     # 取消当前报刀人的出刀申请
-    await cancel_challenge(group_id, user_id)
+    await cancel_challenge(group_id, user_id=user_id)
     #取消预约
     #
 
@@ -145,7 +146,7 @@ async def end_report(group_id: str, user_id: str, args: Namespace):
     _t, _b, _c, _n = await on_tree(group_id, user_id)
     if not (_b or args.n):
         return [{"text":"\n请先 申请出刀 或 指定首领编号报刀\n"+REPORT_HELP}]
-    if _b and int(args.n) != _b:
+    if _b and args.n and int(args.n) != int(_b):
         res.append({"text": "您报刀首领与预约首领不一致，以当前命令获取的首领编号执行后续操作"})
     boss_id = (args.n or _b)
     # 检查持否持有补偿刀
@@ -194,9 +195,9 @@ async def end_report(group_id: str, user_id: str, args: Namespace):
             if _tavg > _tmax-0.3: # 只剩自己在较低阶段，剩下4个的平均数为.8。到底是寄巧，还是大雷，我不知道
                 for i in range(1,6):
                     if _status[i-1] == 0:
-                        await update_bosshp(group_id, i, user_id, turn+2, await get_maxhp(turn, boss_id))
+                        await update_bosshp(group_id, i, user_id, turn+2, await get_maxhp(turn, i))
     # 取消申请
-    await cancel_challenge(group_id, user_id)
+    await cancel_challenge(group_id, boss_id=boss_id)
     #取消预约
     #
 

@@ -23,8 +23,13 @@ __all__ = [
 # 中文习惯的伤害值转换
 
 SINT_NUMBER = re.compile(r"([0-9]\.?[0-9]*)k?w?e?")
+SINT_HELP = """\
+数字格式：
+  数字，数字k，数字w，数字e
+  23000000，2300w，2.3kw，0.23e"""
 
 class sint:
+    __doc__ = SINT_HELP
     def __init__(self, value: int|float|str):
         self.value = None
         if isinstance(value, int):

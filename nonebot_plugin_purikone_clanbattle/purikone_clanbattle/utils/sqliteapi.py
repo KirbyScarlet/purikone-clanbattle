@@ -242,12 +242,20 @@ async def start_challenge(
 
 async def cancel_challenge(
         group_id: str,
-        user_id: str):
+        user_id: str = None,
+        boss_id: int|str = None):
     """
     取消挑战
     """
-    _t = await dbclient.execute("DELETE FROM purikone_clanbattle_tree WHERE groupid=? and user=?", (group_id, user_id))
-    await dbclient.commit()
+    if user_id and boss_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_tree WHERE groupid=? AND user=? AND bossid=?", (group_id, user_id, boss_id))
+        await dbclient.commit()
+    elif user_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_tree WHERE groupid=? AND user=?", (group_id, user_id))
+        await dbclient.commit()
+    elif boss_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_tree WHERE groupid=? AND bossid=?", (group_id, boss_id))
+        await dbclient.commit()
     return
 
 async def boss_status(group_id: str, boss_id: int):
@@ -383,12 +391,16 @@ async def reserve_boss(group_id: str, user_id: str, boss_id: int, nickname: str 
     await dbclient.commit()
     return 
 
-async def cancel_reserve(group_id: str, user_id: str, boss_id: int):
+async def cancel_reserve(group_id: str, user_id: str = None, boss_id: int = None):
     """
     取消预约
     """
-    await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE groupid=? AND user=? AND boss=?;", (group_id, user_id, boss_id))
-    await dbclient.commit()
+    if user_id and boss_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE groupid=? AND user=? AND boss=?;", (group_id, user_id, boss_id))
+        await dbclient.commit()
+    elif boss_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE gouprid=? AMD boss=?;", (group_id, boss_id))
+        await dbclient.commit()
     return
 
 async def get_reserve(group_id: str, boss_id: int = 0):

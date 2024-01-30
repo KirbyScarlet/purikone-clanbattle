@@ -8,3 +8,4 @@ from . import hedao
 from . import report
 from . import status
 from . import tree
+from . import modify

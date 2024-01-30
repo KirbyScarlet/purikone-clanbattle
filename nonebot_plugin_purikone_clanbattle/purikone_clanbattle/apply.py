@@ -11,6 +11,7 @@ from .utils.sqliteapi import (
     get_status,
     cancel_challenge
 )
+from nonebot.log import logger
 
 APPLY_HELP = """\
 命令格式：
@@ -24,6 +25,8 @@ async def apply_parser(msg: Message):
     if len(m) == 1:
         if m in "12345":
             return Namespace(n=m, b=False, info="")
+    elif "取消" in m:
+        return Namespace(n=0, b=False, info="取消")
     elif len(m) == 2:
         if m[0] in "12345" and m[1] in "b补":
             return Namespace(n=m[0], b=True, info="")
@@ -35,6 +38,8 @@ async def apply_parser(msg: Message):
     return None    
 
 async def apply(group_id: str, user_id: str, args: Namespace) -> list[dict]:
+    if args.n == 0:
+        return await cancel_apply(group_id, user_id)
     res_text = []
     # 检查有没有预约过或挂在树上
     _t, _b, _c, n = await on_tree(group_id, user_id)
@@ -58,12 +63,12 @@ async def apply(group_id: str, user_id: str, args: Namespace) -> list[dict]:
             res_text.append({"text": f"正在挑战 {r[-1]}\n"})
     return res_text
 
-async def cancel_apply(group_id: int, user_id: int) -> str:
+async def cancel_apply(group_id: str, user_id: str) -> list[dict]:
     res_text = []
         # 检查有没有预约过或挂在树上
-    _t = on_tree(group_id, user_id)
+    _t = await on_tree(group_id, user_id)
     if _t:
-        await cancel_challenge(group_id, user_id)
+        await cancel_challenge(group_id, user_id=user_id)
         res_text.append({"text": f"取消申请成功"})
     else:
         res_text.append({"text": f"你还没有预约过呢"})

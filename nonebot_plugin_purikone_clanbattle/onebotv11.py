@@ -52,7 +52,7 @@ async def _apply(bot: Bot, event: Event, matcher: Matcher, state: T_State, msg: 
 
 apply_simple = on_command("进")
 
-@apply.handle()
+@apply_simple.handle()
 async def _apply_simple(bot: Bot, event: Event, matcher: Matcher, state: T_State, msg: Message = CommandArg()):
     await check_group_clanbattle_start(event, apply_simple, state)
     arg = await pcr.apply.apply_parser(msg)
@@ -130,6 +130,7 @@ cancel_tree = on_command("下树", aliases={"取消挂树"})
 
 @tree.handle()
 async def _tree(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    await check_group_clanbattle_start(event, user, state)
     m = msg.extract_plain_text()
     res = await pcr.tree.tree(state["group_id"], state["user_id"], m)
     await tree.finish(await build_message(res))
@@ -139,3 +140,13 @@ async def _cancel_tree(bot: Bot, event: Event, state: T_State, msg: Message = Co
     res = await pcr.tree.christmas_tree(state["group_id"], state["user_id"])
     await cancel_tree.finish(await build_message(res))
 
+modify = on_command("修改")
+
+@modify.handle()
+async def _modify(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    await check_group_clanbattle_start(event, user, state)
+    args = await pcr.modify.modify_parser(msg)
+    if args.error:
+        await modify.finish(await build_message(args.error))
+    res = await pcr.modify.modify(state["group_id"], args)
+    await modify.finish(await build_message(res))
