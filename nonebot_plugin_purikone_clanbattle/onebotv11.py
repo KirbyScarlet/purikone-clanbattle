@@ -150,3 +150,13 @@ async def _modify(bot: Bot, event: Event, state: T_State, msg: Message = Command
         await modify.finish(await build_message(args.error))
     res = await pcr.modify.modify(state["group_id"], args)
     await modify.finish(await build_message(res))
+
+reserve = on_command("预约")
+
+@reserve.handle()
+async def _reserve(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    await check_group_clanbattle_start(event, user, state)
+    args = await pcr.reserve.reserve_parser(msg)
+    if not args:
+        await reserve.finish(pcr.reserve.RESERVE_HELP)
+    await reserve.finish(str(args))

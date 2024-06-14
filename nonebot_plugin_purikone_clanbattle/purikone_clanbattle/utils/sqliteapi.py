@@ -91,7 +91,7 @@ CREATE TABLE purikone_clanbattle_reserve(
 );""")
     await dbclient.commit()
 
-async def group_check(group_id: str) -> (str, str):
+async def group_check(group_id: str) -> tuple[str, str]:
     """
     检查当前群是否开启会战
     return 服务器地区，开始会战时间

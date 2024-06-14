@@ -2,9 +2,10 @@
 
 from argparse import Namespace
 from nonebot.adapters import Message
-from utils.sqliteapi import (
+from .utils.sqliteapi import (
     reserve_boss,
     cancel_reserve,
+    get_reserve,
     get_step
 )
 import re
@@ -22,7 +23,7 @@ RESERVE_HELP = """\
     预约e阶段第一个4号首领"""
 
 async def reserve_parser(msg: Message):
-    m = "".join(msg.extract_plain_text())
+    m = msg.extract_plain_text()
     if m in "12345":
         return Namespace(turn=0, bossid=int(m))
     elif re.match(r"\d+-[12345]", m):

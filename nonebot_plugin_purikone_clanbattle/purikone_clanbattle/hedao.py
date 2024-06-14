@@ -14,7 +14,7 @@ HEDAO_HELP = """\
 尽可能计算满补所需垫刀
 ========================="""
 
-async def hedao_parser(msg: Message) -> [int, int, int]:
+async def hedao_parser(msg: Message) -> list["int", "int", "int"]:
     msg = msg.extract_plain_text().split()
     try:
         num = list(map(int, msg))
@@ -62,7 +62,12 @@ async def hedao(a: int, b: int, c: int) -> list[dict]:
         else:
             res.append({"text":f"剩余血量{a}，刀伤{b}，补偿{comp(b,a):.2f}秒，再垫{int(decomp(b,a))+1}满补\n"})
         res.append({"text":"==========\n"})
-        res.append({"text":f"剩余血量{b}，刀伤{a}，还差{b-a}\n第二刀砍{int(decomp(a,b)+1)}，刀伤{a}吃满补"})
+        res.append({"text":f"剩余血量{b}，刀伤{a}，还差{b-a}\n"})
+        # if decomp(a,b-a)+a>b:
+        #     pass
+        # else:
+        #     res.append({"text":f"刀伤{a}先出，第二刀满补需要打{decomp(a,b-a)+a}\n"})
+        res.append({"text":f"第二刀砍{int(decomp(a,b)+1)}，刀伤{a}吃满补"})
         if (b-a)*30/7+1<b:
             res.append({"text":f"\n刀伤{a}先出，第二刀超过{int((b-a)*30/7)+1}可满补"})
     return res

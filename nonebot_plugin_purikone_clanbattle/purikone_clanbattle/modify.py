@@ -50,7 +50,7 @@ async def modify_parser(msg: Message) -> Namespace:
             res["modify"].append(p)
     for i in range(len(res["modify"])):
         res["modify"][i]["bossid"] = int(res["modify"][i]["bossid"])
-        res["modify"][i]["turn"] = int(res["modify"][i]["turn"])
+        res["modify"][i]["turn"] = int(res["modify"][i]["turn"] or 0)
         res["modify"][i]["maxhp"] = bool(res["modify"][i]["maxhp"])
         if res["modify"][i]["maxhp"]:
             res["modify"][i]["hp"] = 0
@@ -73,6 +73,8 @@ async def modify(group_id: str, args: Namespace):
     for m in args.modify:
         if m["turn"]:
             _t[m["bossid"]-1] = m["turn"]
+        else:
+            m["turn"] = _t[m["bossid"]-1]
         if m["maxhp"]:
             _hp[m["bossid"]-1] = await get_maxhp(m["turn"], m["bossid"])
         elif m["hp"]:
