@@ -16,6 +16,7 @@ from nonebot.params import CommandArg
 from nonebot import on_command, on_message
 from nonebot.message import event_preprocessor
 from nonebot.typing import T_State
+from nonebot.log import logger
 
 from . import purikone_clanbattle as pcr
 
@@ -23,6 +24,7 @@ from . import purikone_clanbattle as pcr
 async def _(event: MessageEvent, state: T_State):
     state["group_id"] = event.group_id
     state["user_id"] = event.sender.user_id
+    # logger.info(event.json())
 
 async def build_message(res: list[dict]) -> Message:
     m = Message()
@@ -160,3 +162,9 @@ async def _reserve(bot: Bot, event: Event, state: T_State, msg: Message = Comman
     if not args:
         await reserve.finish(pcr.reserve.RESERVE_HELP)
     await reserve.finish(str(args))
+
+test = on_command("测试", aliases={"test"})
+@test.handle()
+async def _test(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    await test.finish(MessageSegment.at(event.sender.user_id)+MessageSegment.text(" ciallo~"))
+                

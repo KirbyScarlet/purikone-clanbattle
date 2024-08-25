@@ -44,6 +44,8 @@ class sint:
                 if "e" in value:
                     num *= Decimal("100000000")
                 self.value = int(num)
+        if value == "":
+            self.value = 0
         if self.value is None:
             raise ValueError("输入的数字有误")
     def __add__(self, other: int|float|str):

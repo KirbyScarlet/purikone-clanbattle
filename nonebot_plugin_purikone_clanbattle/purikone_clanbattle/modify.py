@@ -4,6 +4,7 @@ __all__ = []
 
 from argparse import Namespace
 from nonebot.adapters import Message
+from nonebot.log import logger
 
 from .utils.sqliteapi import (
     get_chapter,
@@ -44,6 +45,7 @@ async def modify_parser(msg: Message) -> Namespace:
     }
     for m in msg.extract_plain_text().split():
         p = parser.match(m).groupdict()
+        logger.info(str(p))
         if not p["bossid"] or not (p["turn"] or p["hp"] or p["maxhp"]):
             res["error"].append({"text": f"{m} 命令格式错误\n+{MODIFY_HELP}"})
         else: 
@@ -54,7 +56,9 @@ async def modify_parser(msg: Message) -> Namespace:
         res["modify"][i]["maxhp"] = bool(res["modify"][i]["maxhp"])
         if res["modify"][i]["maxhp"]:
             res["modify"][i]["hp"] = 0
-        if res["modify"][i]["hp"] is not None:
+        if res["modify"][i]["hp"] == "":
+            pass
+        elif not res["modify"][i]["hp"]:
             try:
                 res["modify"][i]["hp"] = sint(res["modify"][i]["hp"])
             except ValueError:
