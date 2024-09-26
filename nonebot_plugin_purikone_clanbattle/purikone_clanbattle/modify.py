@@ -58,7 +58,7 @@ async def modify_parser(msg: Message) -> Namespace:
             res["modify"][i]["hp"] = 0
         if res["modify"][i]["hp"] == "":
             pass
-        elif not res["modify"][i]["hp"]:
+        elif res["modify"][i]["hp"]:
             try:
                 res["modify"][i]["hp"] = sint(res["modify"][i]["hp"])
             except ValueError:
