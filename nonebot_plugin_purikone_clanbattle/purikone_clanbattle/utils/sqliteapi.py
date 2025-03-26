@@ -4,13 +4,28 @@ import aiosqlite
 import time
 import pathlib
 from nonebot import get_driver
+from .config import purikone_config
 
 if not pathlib.Path("data/purikone").exists():
     pathlib.Path("data/purikone").mkdir(parents=True, exist_ok=True)
 
-DB_PATH = "data/purikone/purikone_clanbattle.db"
+DB_PATH = pathlib.Path("data/purikone/purikone_clanbattle.db")
 
 dbclient = asyncio.run(aiosqlite.connect(DB_PATH).__aenter__())
+
+@get_driver().on_startup
+async def _():
+    try:
+        await dbclient.execute("select * from purikone_clanbattle_group")
+    except:
+        await init_db()
+    print(purikone_config.purikone_clanbattle_settings)
+    for server in purikone_config.purikone_clanbattle_settings:
+        r = await dbclient.execute_fetchall("select * from purikone_clanbattle_settings WHERE server=?", (server,))
+        if not r:
+            for items in purikone_config.purikone_clanbattle_settings[server]:
+                await dbclient.execute("INSERT INTO purikone_clanbattle_settings VALUES(?,?,?,?,?,?,?,?)", (server, *items))
+            await dbclient.commit()
 
 @get_driver().on_shutdown
 async def _():
@@ -301,6 +316,9 @@ async def get_turn(
         boss_id: int
 ):
     _t = await dbclient.execute_fetchall(f"SELECT turn FROM purikone_clanbattle_status WHERE groupid=? AND bossid=? ORDER BY date DESC limit 1;", (group_id, boss_id))
+    if not _t:
+        await update_bosshp(group_id, boss_id, "0", 1, await get_maxhp(1, boss_id))
+        _t = [[await get_maxhp(1, boss_id)]]
     return int(list(_t)[0][0])
 
 async def get_step(chapter: str = ""):
@@ -361,7 +379,7 @@ def get_today_start_time(server="B"):
     获取结算周期的纳秒时间戳
     """
     offset = {
-        "B": 3, # 结算为国际标准时间，为昨天晚上21点
+        "B": 3, # 国服结算时间为5:00 utc+8，国际标准时间为昨天晚上21点
         "J": 4,
         "T": 4
     }
