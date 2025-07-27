@@ -56,7 +56,9 @@ apply_simple = on_command("进")
 
 @apply_simple.handle()
 async def _apply_simple(bot: Bot, event: Event, matcher: Matcher, state: T_State, msg: Message = CommandArg()):
-    await check_group_clanbattle_start(event, apply_simple, state)
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await matcher.finish()
     arg = await pcr.apply.apply_parser(msg)
     if arg is None:
         await apply_simple.finish()
@@ -161,7 +163,8 @@ async def _reserve(bot: Bot, event: Event, state: T_State, msg: Message = Comman
     args = await pcr.reserve.reserve_parser(msg)
     if not args:
         await reserve.finish(pcr.reserve.RESERVE_HELP)
-    await reserve.finish(str(args))
+    res = await pcr.reserve.reserve(state["group_id"], state["user_id"], args)
+    await reserve.finish(await build_message(res))
 
 test = on_command("测试", aliases={"test"})
 @test.handle()

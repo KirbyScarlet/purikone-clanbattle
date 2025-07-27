@@ -99,7 +99,6 @@ CREATE TABLE purikone_clanbattle_history(
 CREATE TABLE purikone_clanbattle_reserve(
     groupid TEXT,
     user TEXT,
-    nickname TEXT,
     turn INTEGER,
     bossid INTEGER,
     notes TEXT
@@ -405,7 +404,7 @@ async def reserve_boss(group_id: str, user_id: str, boss_id: int, nickname: str 
     """
     预约出刀
     """
-    await dbclient.execute("INSERT INTO purikone_clanbattle_reserve VALUES (?,?,?,?,?,?);", (group_id, user_id, (nickname or user_id), turn, boss_id, notes))
+    await dbclient.execute("INSERT INTO purikone_clanbattle_reserve VALUES (?,?,?,?,?);", (group_id, (nickname or user_id), turn, boss_id, notes))
     await dbclient.commit()
     return 
 
@@ -414,19 +413,25 @@ async def cancel_reserve(group_id: str, user_id: str = None, boss_id: int = None
     取消预约
     """
     if user_id and boss_id:
-        await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE groupid=? AND user=? AND boss=?;", (group_id, user_id, boss_id))
+        await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE groupid=? AND user=? AND bossid=?;", (group_id, user_id, boss_id))
         await dbclient.commit()
+        return True
+    elif user_id:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE groupid=? AND user=?;", (group_id, user_id))
+        await dbclient.commit()
+        return True
     elif boss_id:
         await dbclient.execute("DELETE FROM purikone_clanbattle_reserve WHERE gouprid=? AMD boss=?;", (group_id, boss_id))
         await dbclient.commit()
-    return
+        return True
+    return False
 
 async def get_reserve(group_id: str, boss_id: int = 0):
     """
     查询预约表
     """
     if boss_id in range(1,6):
-        _r = await dbclient.execute_fetchall("SELECT * FROM purikone_clanbattle_reserve WHERE groupid=? AND boss=?", (group_id, boss_id))
+        _r = await dbclient.execute_fetchall("SELECT * FROM purikone_clanbattle_reserve WHERE groupid=? AND bossid=?", (group_id, boss_id))
         return list(_r)
     elif not boss_id:
         _r = await dbclient.execute_fetchall("SELECT * FROM purikone_clanbattle_reserve WHERE groupid=?", (group_id, ))

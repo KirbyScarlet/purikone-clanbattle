@@ -17,7 +17,10 @@ from .utils.sqliteapi import (
     compensiated,
     update_history,
     cancel_challenge,
+    cancel_reserve,
+    get_reserve,
 )
+from .reserve import reserve_report
 from .utils import sint
 
 # 有问题，暂时弃用
@@ -100,6 +103,8 @@ async def end_report_parser(msg: Message):
 async def report(group_id: str, user_id: str, args: Namespace):
     # 检查是否申请出刀
     res = []
+    if args.n == -1:
+        return [{"text": "已记录"}]
     _t, _b, _c, _n = await on_tree(group_id, user_id)
     if not (_b or args.n):
         return [{"text":"\n请先 申请出刀 或 指定首领编号报刀\n"+REPORT_HELP}]
@@ -176,29 +181,34 @@ async def end_report(group_id: str, user_id: str, args: Namespace):
                 for i in range(1, 6): #全部进入下周目
                     await update_bosshp(group_id, i, user_id, int(turn)+1, await get_maxhp(turn+1, i))
                 res.append({"text": f"当前【{int(turn)+1}-{boss_id}】剩余血量{await get_maxhp(int(turn)+1, boss_id)}"})
+                res.extend(await reserve_report(group_id, i))
             else:
                 res.append({"text": f"【{turn}-{boss_id}】无法继续挑战"})
         else: # 当前王不跨阶段，则该王进下一周目
             await update_bosshp(group_id, boss_id, user_id, turn+1, await get_maxhp(turn+1, boss_id))
-            res.append({"text": f"当前【{int(turn)+1}-{boss_id}】剩余血量{await get_maxhp(turn, boss_id)}"})
+            res.append({"text": f"当前【{int(turn)+1}-{boss_id}】剩余血量{await get_maxhp(turn, boss_id)}\n"})
+            res.extend(await reserve_report(group_id, boss_id))
     else:  #当前不跨阶段
         if _tmin == _tmax: # 当前所有王在相同阶段
             await update_bosshp(group_id, boss_id, user_id, turn+1, await get_maxhp(turn, boss_id))
             res.append({"text": f"当前【{int(turn)+1}-{boss_id}】剩余血量{await get_maxhp(turn, boss_id)}"})
+            res.extend(await reserve_report(group_id, boss_id))
         elif turn == _tmax: # 当前王出完后不可再挑战 
             await update_bosshp(group_id, boss_id, user_id, turn, 0)
             res.append({"text": f"【{turn}-{boss_id}】无法继续挑战"})
         else: #该王进入下一阶段，并判断当前是否存在不可挑战的王并进入下已周目
             await update_bosshp(group_id, boss_id, user_id, turn+1, await get_maxhp(turn+1, boss_id))
             res.append({"text": f"当前【{int(turn)+1}-{boss_id}】剩余血量{await get_maxhp(turn, boss_id)}"})
+            res.extend(await reserve_report(group_id, boss_id))
             _status = [await get_currenthp(group_id, i) for i in range(1,6)]
             if _tavg > _tmax-0.3: # 只剩自己在较低阶段，剩下4个的平均数为.8。到底是寄巧，还是大雷，我不知道
                 for i in range(1,6):
                     if _status[i-1] == 0:
                         await update_bosshp(group_id, i, user_id, turn+2, await get_maxhp(turn, i))
+                        res.extend(await reserve_report(group_id, i))
     # 取消申请
     await cancel_challenge(group_id, boss_id=boss_id)
-    #取消预约
-    #
+    # 取消预约
+    await cancel_reserve(group_id, user_id, boss_id)
 
     return res
