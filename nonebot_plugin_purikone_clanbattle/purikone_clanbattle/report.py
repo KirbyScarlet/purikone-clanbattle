@@ -136,7 +136,7 @@ async def report(group_id: str, user_id: str, args: Namespace):
     # 取消当前报刀人的出刀申请
     await cancel_challenge(group_id, user_id=user_id)
     #取消预约
-    #
+    await cancel_reserve(group_id, user_id, boss_id)
 
     res.append({"text": f"对{turn}周目{boss_id}号首领造成了{damage}点伤害\n当前【{turn}-{boss_id}】剩余血量{current_bosshp}"})
 

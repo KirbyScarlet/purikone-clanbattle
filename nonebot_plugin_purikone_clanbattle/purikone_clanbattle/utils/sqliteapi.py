@@ -62,7 +62,7 @@ CREATE TABLE purikone_clanbattle_user(
     user TEXT,
     nickname TEXT
 );""")
-    # 挂树表 用户id 几王 刀型是否补偿刀 额外文字信息
+    # 挂树表 用户id 是否挂树 几王 刀型是否补偿刀 额外文字信息
     await dbclient.execute(f"""\
 CREATE TABLE purikone_clanbattle_tree(
     groupid TEXT,
@@ -236,9 +236,9 @@ async def get_status(group_id: str, boss_id: int = 0):
     查树上多少人
     """
     if boss_id:
-        _t = await dbclient.execute_fetchall("SELECT user,tree,notes FROM purikone_clanbattle_tree WHERE groupid=? AND bossid=?", (group_id, boss_id))
+        _t = await dbclient.execute_fetchall("SELECT user,tree,compensiate,notes FROM purikone_clanbattle_tree WHERE groupid=? AND bossid=?", (group_id, boss_id))
     else:
-        _t = await dbclient.execute_fetchall("SELECT user,tree,notes FROM purikone_clanbattle_tree WHERE groupid=?", (group_id,))
+        _t = await dbclient.execute_fetchall("SELECT user,tree,compensiate,notes FROM purikone_clanbattle_tree WHERE groupid=?", (group_id,))
     return list(_t)
 
 async def start_challenge(

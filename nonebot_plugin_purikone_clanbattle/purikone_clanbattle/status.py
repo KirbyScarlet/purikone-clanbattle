@@ -28,10 +28,10 @@ async def status(group_id: str):
         for t in _tree:
             if t[1] == 1:
                 res.append({"at": t[0]})
-                res.append({"text": f" 已挂树 {t[2]}\n"})
+                res.append({"text": f" 已挂树 {"补偿刀 " if t[2] else ""}{t[3]}\n"})
             else:
                 res.append({"at": t[0]})
-                res.append({"text": f" 正在挑战\n"})
+                res.append({"text": f" 正在挑战 {"补偿刀 " if t[2] else ""}{t[3]}\n"})
         for h in _hedao:
             if turn==h[2]:
                 res.append({"at": h[1]})
@@ -49,10 +49,10 @@ async def status(group_id: str):
             currentturn = await get_turn(group_id, bossid)
             if turn == 0:
                 res.append({"at": user})
-                res.append({"text": f"预约【{currentturn+1}-{bossid}】 {notes}\n"})
+                res.append({"text": f"【{currentturn+1}-{bossid}】 {notes}\n"})
             else:
                 res.append({"at": user})
-                res.append({"text": f"预约【{turn}-{bossid}】{notes}\n"})
+                res.append({"text": f"【{turn}-{bossid}】{notes}\n"})
 
     return res
 

@@ -57,10 +57,10 @@ async def apply(group_id: str, user_id: str, args: Namespace) -> list[dict]:
     for r in await get_status(group_id, args.n):
         if r[1]:
             res_text.append({"at":f"{r[0]}"})
-            res_text.append({"text": f"已挂树 {r[-1]}\n"})
+            res_text.append({"text": f" 已挂树 {"补偿刀 " if r[2] else ""}{r[-1]}\n"})
         else:
             res_text.append({"at":f"{r[0]}"})
-            res_text.append({"text": f"正在挑战 {r[-1]}\n"})
+            res_text.append({"text": f" 正在挑战 {"补偿刀 " if r[2] else ""}{r[-1]}\n"})
     return res_text
 
 async def cancel_apply(group_id: str, user_id: str) -> list[dict]:
