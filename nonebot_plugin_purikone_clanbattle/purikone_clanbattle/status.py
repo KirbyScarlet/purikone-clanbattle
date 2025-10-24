@@ -50,6 +50,9 @@ async def status(group_id: str):
             if turn == 0:
                 res.append({"at": user})
                 res.append({"text": f"【{currentturn+1}-{bossid}】 {notes}\n"})
+            elif turn == -1:
+                res.append({"at": user})
+                res.append({"text": f"【{bossid}】可合刀 {notes}\n"})
             else:
                 res.append({"at": user})
                 res.append({"text": f"【{turn}-{bossid}】{notes}\n"})

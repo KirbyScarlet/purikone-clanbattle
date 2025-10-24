@@ -30,7 +30,7 @@ async def tree(group_id: str, user_id: str, msg: str):
     currenthp = await get_currenthp(group_id, _b)
     res.append({"text": f"【{turn}-{_b}】: {currenthp} / {maxhp}\n"})
     _s = await get_status(group_id, _b)
-    for user, tree, notes in _s:
+    for user, tree, _, notes in _s:
         res.append({"at": f"{user}"})
         res.append({"text": f"{'已挂树' if tree else '正在挑战'} {notes}\n"})
     return res

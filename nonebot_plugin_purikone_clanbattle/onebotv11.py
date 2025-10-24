@@ -75,6 +75,20 @@ async def _create(bot: Bot, event: Event, matcher: Matcher, state: T_State, msg:
     res = await pcr.create.create(state["group_id"], arg)
     await create.finish(await build_message(res))
 
+restart = on_command("会战重置")
+
+@restart.handle()
+async def _restart(bot: Bot, event: Event, matcher: Matcher, state: T_State, msg: Message = CommandArg()):
+    server, _ = await pcr.create.group_check(state["group_id"])
+    if not server:
+        await restart.finish("该群未创建会战，请先创建会战")
+
+    res = await pcr.create.restart(state["group_id"])
+    if res:
+        await restart.finish("重置成功")
+    else:
+        await restart.finish("重置的有点问题")
+
 user = on_command("加入行会")
 
 @user.handle()

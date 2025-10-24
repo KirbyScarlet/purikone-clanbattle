@@ -14,6 +14,9 @@ CREATE_HELP="""
 B 简中官服
 J 日服
 T 省服"""
+RESTART_HELP = """
+命令格式：
+  @机器人 会战重置"""
 
 async def create_parser(msg: Message):
     msg = msg.extract_plain_text()
@@ -41,3 +44,6 @@ async def create(group_id: str, args: Namespace) -> list[dict]:
         res_text.append({"text": """\
 会战开始"""})
     return res_text
+
+async def restart(group_id: str) -> bool:
+    await group_reset(group_id)
