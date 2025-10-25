@@ -43,6 +43,9 @@ REPORT_HELP = """\
   报刀 2 200w b
   报刀 2200w （已申请出刀）
   报刀 300w b （已申请出刀）
+数字格式：
+  数字，数字k，数字w，数字e
+  23000000，2300w，2.3kw，0.23e
 """
 
 async def report_parser(msg: Message):

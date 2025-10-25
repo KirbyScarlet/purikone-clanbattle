@@ -22,7 +22,7 @@ __all__ = [
 ###########################
 # 中文习惯的伤害值转换
 
-SINT_NUMBER = re.compile(r"([0-9]\.?[0-9]*)k?w?e?")
+SINT_NUMBER = re.compile(r"([0-9]\.?[0-9]*)[kK]?[wW]?[eE]?")
 SINT_HELP = """\
 数字格式：
   数字，数字k，数字w，数字e
@@ -37,11 +37,11 @@ class sint:
         if isinstance(value, str):
             if r:=SINT_NUMBER.fullmatch(value):
                 num = Decimal(r.groups()[0])
-                if "k" in value:
+                if "k" in value or "K" in value:
                     num *= Decimal("1000")
-                if "w" in value:
+                if "w" in value or "W" in value:
                     num *= Decimal("10000")
-                if "e" in value:
+                if "e" in value or "E" in value:
                     num *= Decimal("100000000")
                 self.value = int(num)
         if value == "":

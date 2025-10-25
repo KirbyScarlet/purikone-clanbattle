@@ -1,6 +1,7 @@
 #合刀计算
 
 from nonebot.internal.adapter import Bot, Event, Message
+from .utils import sint
 
 HEDAO_HELP = """\
 使用说明：
@@ -19,9 +20,10 @@ HEDAO_HELP = """\
 async def hedao_parser(msg: Message) -> list["int", "int", "int"]:
     msg = msg.extract_plain_text().split()
     try:
-        num = list(map(int, msg))
+        num = list(map(sint, msg))
     except ValueError:
         return None, None, None
+    num = [i.value for i in num]
     num.sort()
     if 1 == len(msg):
         return num[0], None, None
@@ -45,7 +47,7 @@ def decomp(h1, maxhp):
     # 计算垫刀
     return maxhp-7*h1/30
 
-async def hedao(a: int, b: int, c: int) -> list[dict]:
+async def hedao(a: sint, b: sint, c: sint) -> list[dict]:
     res = [{"text":"\n"}]
     if c:
         if a+b<c:
