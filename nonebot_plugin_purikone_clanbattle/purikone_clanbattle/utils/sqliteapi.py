@@ -223,12 +223,15 @@ async def climb_tree(group_id: str, user_id: str, notes: str = ""):
     await dbclient.commit()
     return
 
-async def fell_tree(group_id: str, user_id: str):
+async def fell_tree(group_id: str, user_id: str = ""):
     """
     下树
     """
-    await dbclient.execute("UPDATE purikone_clanbattle_tree SET tree=0 WHERE groupid=? AND user=?", (group_id, user_id))
-    await dbclient.commit()
+    if user_id:
+        await dbclient.execute("UPDATE purikone_clanbattle_tree SET tree=0 WHERE groupid=? AND user=?", (group_id, user_id))
+        await dbclient.commit()
+    else:
+        await dbclient.execute("DELETE FROM purikone_clanbattle_tree WHERE groupid=?", (group_id,))
     return
 
 async def get_status(group_id: str, boss_id: int = 0):

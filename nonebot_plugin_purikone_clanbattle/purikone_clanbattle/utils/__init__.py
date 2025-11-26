@@ -22,11 +22,11 @@ __all__ = [
 ###########################
 # 中文习惯的伤害值转换
 
-SINT_NUMBER = re.compile(r"([0-9]\.?[0-9]*)[kK]?[wW]?[eE]?")
+SINT_NUMBER = re.compile(r"([0-9]\.?[0-9]*)[kK]?[wW]?[mM]?[eE]?")
 SINT_HELP = """\
 数字格式：
-  数字，数字k，数字w，数字e
-  23000000，2300w，2.3kw，0.23e"""
+  数字，数字k，数字w，数字m，数字e
+  23000000，2300w，23m, 2.3kw，0.23e"""
 
 class sint:
     __doc__ = SINT_HELP
@@ -41,6 +41,8 @@ class sint:
                     num *= Decimal("1000")
                 if "w" in value or "W" in value:
                     num *= Decimal("10000")
+                if "m" in value or "M" in value:
+                    num *= Decimal("1000000")
                 if "e" in value or "E" in value:
                     num *= Decimal("100000000")
                 self.value = int(num)

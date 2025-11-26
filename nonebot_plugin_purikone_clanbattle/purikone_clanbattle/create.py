@@ -46,4 +46,8 @@ async def create(group_id: str, args: Namespace) -> list[dict]:
     return res_text
 
 async def restart(group_id: str) -> bool:
-    await group_reset(group_id)
+    try:
+        await group_reset(group_id)
+    except:
+        return False
+    return True

@@ -11,7 +11,8 @@ from .utils.sqliteapi import (
     climb_tree,
     get_status,
     get_turn,
-    fell_tree
+    fell_tree,
+    start_challenge
 )
 
 async def tree(group_id: str, user_id: str, msg: str):
@@ -19,7 +20,8 @@ async def tree(group_id: str, user_id: str, msg: str):
     # 检查刀手是否申请出刀
     _t, _b, _c, _n = await on_tree(group_id, user_id)
     if not _b:
-        return [{"text": "你想挂哪颗树？请先申请出刀。"}]
+        res.append({"text": "您未申请出刀，已自动申请。\n"})
+        await start_challenge(group_id, user_id, _b, False, "")
     if _t:
         return [{"text": "你已经在树上。"}]
     await climb_tree(group_id, user_id, msg)

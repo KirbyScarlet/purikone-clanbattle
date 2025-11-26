@@ -119,14 +119,17 @@ async def reserve(group_id: str, user_id: str, msg: Namespace):
             res.append({"text":f"预约下一个{msg.bossid}号首领成功"})
     return res
     
-async def reserve_report(group_id: str, boss_id: int):
+async def reserve_report(group_id: str, boss_id: int, user_id: str = ""):
     res = []
     reserved = await get_reserve(group_id=group_id, boss_id=boss_id)
     for _group_id, user, turn, boss_id, notes in reserved:
         res.append({"at": user})
         current_turn = await get_turn(group_id=group_id, boss_id=boss_id)
         if turn == -1:
-            res.append({"text": "当前首领已击败，已自动预约下一个首领"})
+            if user_id == user:
+                return []
+            else:
+                res.append({"text": "当前首领已击败，已自动预约下一个首领"})
             await cancel_reserve(group_id=group_id, user_id=user, boss_id=boss_id)
             await reserve_boss(group_id=group_id, user_id=user, boss_id=boss_id, turn=0, notes=notes)
         elif turn == 0 or turn == current_turn:
