@@ -115,6 +115,9 @@ end_report = on_command("尾刀")
 
 @report.handle()
 async def _report(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()): #, args: Namespace = ShellCommandArgs()):
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
     await check_group_clanbattle_start(event, user, state)
     arg = await pcr.report.report_parser(msg)
     if arg is None:
@@ -124,6 +127,9 @@ async def _report(bot: Bot, event: Event, state: T_State, msg: Message = Command
 
 @end_report.handle()
 async def _end_report(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
     await check_group_clanbattle_start(event, user, state)
     arg = await pcr.report.end_report_parser(msg)
     if arg is None:
@@ -135,7 +141,10 @@ status = on_command("状态", aliases={"进度"})
 
 @status.handle()
 async def _status(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
-    await check_group_clanbattle_start(event, user, state)
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
+    #await check_group_clanbattle_start(event, user, state)
     if len(msg) > 0:
         await status.finish()
     else:
@@ -148,6 +157,9 @@ cancel_tree = on_command("下树", aliases={"取消挂树"})
 
 @tree.handle()
 async def _tree(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
     await check_group_clanbattle_start(event, user, state)
     m = msg.extract_plain_text()
     res = await pcr.tree.tree(state["group_id"], state["user_id"], m)
@@ -162,6 +174,9 @@ modify = on_command("修改")
 
 @modify.handle()
 async def _modify(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
     await check_group_clanbattle_start(event, user, state)
     args = await pcr.modify.modify_parser(msg)
     if args.error:
@@ -173,12 +188,19 @@ reserve = on_command("预约")
 
 @reserve.handle()
 async def _reserve(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    server, _ = await pcr.utils.sqliteapi.group_check(state["group_id"])
+    if not server:
+        await status.finish()
     await check_group_clanbattle_start(event, user, state)
     args = await pcr.reserve.reserve_parser(msg)
     if not args:
         await reserve.finish(pcr.reserve.RESERVE_HELP)
     res = await pcr.reserve.reserve(state["group_id"], state["user_id"], args)
     await reserve.finish(await build_message(res))
+
+#settings = on_command("设置")
+#async def _settings(bot: Bot, event: Event, state: T_State, msg: Message = CommandArg()):
+    
 
 test = on_command("测试", aliases={"test"})
 @test.handle()

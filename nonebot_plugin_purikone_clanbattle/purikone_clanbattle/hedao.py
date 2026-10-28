@@ -23,8 +23,7 @@ async def hedao_parser(msg: Message) -> list["int", "int", "int"]:
         num = list(map(sint, msg))
     except ValueError:
         return None, None, None
-    num = [i.value for i in num]
-    num.sort()
+    num.sort(key=lambda x: x.value)
     if 1 == len(msg):
         return num[0], None, None
     if 2 == len(msg):
@@ -41,14 +40,14 @@ def comp(h1, maxhp) -> float:
 
 def rebate(h1, h2, maxhp) -> float:
     # 合刀剩余秒数
-    return comp(h1, maxhp-h2)
+    return comp(h1.value, maxhp.value-h2.value)
 
 def decomp(h1, maxhp):
     # 计算垫刀
-    return maxhp-7*h1/30
+    return maxhp.value-7*h1.value/30
 
 async def hedao(a: sint, b: sint, c: sint) -> list[dict]:
-    res = [{"text":"\n"}]
+    res = []
     if c:
         if a+b<c:
             res.append({"text":f"不够，还差{c-a-b+1}，进一刀{int((c-a-b)*30/7)+1}吃满补"})
@@ -80,7 +79,7 @@ async def hedao(a: sint, b: sint, c: sint) -> list[dict]:
         if (b-a)*30/7+1<b:
             res.append({"text":f"\n刀伤{a}先出，第二刀超过{int((b-a)*30/7)+1}可满补"})
     elif a:
-        res.append({"text":f"剩余血量{a}，两刀{int(a*30/37)+1}满补\n"})
-        res.append({"text":f"刀伤{a}，剩余血量小于{int(a*7/30)}可满补"})
+        res.append({"text":f"剩余血量{a}，两刀{int(a.value*30/37)+1}满补\n"})
+        res.append({"text":f"刀伤{a}，剩余血量小于{int(a.value*7/30)}可满补"})
     return res
 

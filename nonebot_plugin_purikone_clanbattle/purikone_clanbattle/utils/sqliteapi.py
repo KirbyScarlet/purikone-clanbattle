@@ -5,6 +5,7 @@ import time
 import pathlib
 from nonebot import get_driver
 from .config import purikone_config
+from . import sint
 
 if not pathlib.Path("data/purikone").exists():
     pathlib.Path("data/purikone").mkdir(parents=True, exist_ok=True)
@@ -333,21 +334,21 @@ async def get_step(chapter: str = ""):
     step = [int(i[0])-1 for i in turn]
     return step
 
-async def get_maxhp(turn: int, bossid: int) -> int:
+async def get_maxhp(turn: int, bossid: int) -> sint:
     """
     获取阶段首领最大血量
     """
     c = await get_chapter(int(turn))
     _t = await dbclient.execute_fetchall(f"SELECT boss{bossid} FROM purikone_clanbattle_settings where chapter=?", (c,))
-    return list(_t)[0][0]
+    return sint(list(_t)[0][0])
 
-async def get_currenthp(group_id: str, boss_id: int) -> int:
+async def get_currenthp(group_id: str, boss_id: int) -> sint:
     """
     首领当前生命值
     """
     _hp = await dbclient.execute_fetchall(f"SELECT bosshp FROM purikone_clanbattle_status WHERE groupid=? AND bossid=? ORDER BY date DESC LIMIT 1;", (group_id, boss_id))
     hp = list(_hp)[0][0]
-    return int(hp)
+    return sint(hp)
 
 async def update_bosshp(
         group_id: str, 
@@ -372,8 +373,11 @@ async def update_history(
         end: int,
         compensiate: int
 ):
+    """
+    报刀结算
+    """
     date = time.time_ns()
-    await dbclient.execute(f"INSERT INTO purikone_clanbattle_history (groupid, date, user, turn, bossid, damage, end, compensiate) VALUES (?,?,?,?,?,?,?,?);",(group_id, date, user_id, turn, boss_id, damage, end, compensiate))
+    await dbclient.execute(f"INSERT INTO purikone_clanbattle_history (groupid, date, user, turn, bossid, damage, end, compensiate) VALUES (?,?,?,?,?,?,?,?);",(group_id, date, user_id, turn, boss_id, damage.value, end, compensiate))
     await dbclient.commit()
 
 def get_today_start_time(server="B"):
@@ -441,3 +445,10 @@ async def get_reserve(group_id: str, boss_id: int = 0):
         return list(_r)
     else:
         return None
+    
+async def apply_settings(boss_id: int, max_hp: int):
+    """
+    修改boss最大生命值
+    """
+    if boss_id in range(1,6):
+        bossid = f"boss{boss_id}"

@@ -22,7 +22,7 @@ async def status(group_id: str):
         turn = await get_turn(group_id, i)
         maxhp = await get_maxhp(turn, i)
         currenthp = await get_currenthp(group_id, i)
-        res.append({"text": f"【{turn}-{i}】: {currenthp} / {maxhp}\n"})
+        res.append({"text": f"【{turn}-{i}】: {currenthp} / {maxhp} （{currenthp.value/maxhp.value*100:.1f}%）\r\n"})
         _tree = await get_status(group_id, i)
         _hedao = await get_reserve(group_id, i)
         for t in _tree:
@@ -37,7 +37,7 @@ async def status(group_id: str):
                 res.append({"at": h[1]})
                 res.append({"text": f" 可合刀\n"})
     a, f, e, c = await history_today(group_id)
-    title = {"text": f"今日报刀总数：{a}\n整刀数：{f} 尾刀数：{c} 未补刀：{e-c}\n"}
+    title = {"text": f"今日报刀总数：{a}\n整刀数：{f} 尾刀数：{e-c} 补刀数：{c}\n"}
     res.insert(0, title)
     
     #预约表

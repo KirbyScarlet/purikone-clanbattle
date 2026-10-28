@@ -11,10 +11,10 @@ import asyncio
 
 from .config import purikone_config
 
-from . import sqliteapi
+#from . import sqliteapi
 
 __all__ = [
-    "dbclient",
+    # "dbclient",
     "sint",
     "check_bot"
 ]
@@ -52,19 +52,82 @@ class sint:
             raise ValueError("输入的数字有误")
     def __add__(self, other: int|float|str):
         if isinstance(other, (int, float)):
-            return self.value + other
+            return sint(self.value + other)
         elif isinstance(other, sint):
-            return self.value + other.value
+            return sint(self.value + other.value)
         elif isinstance(other, str):
-            return self.value + _sint(other)
+            return sint(self.value + _sint(other))
     def __sub__(self, other: int|float|str):
-        return self.value - other.value
+        if isinstance(other, (int, float)):
+            return sint(self.value - other)
+        elif isinstance(other, sint):
+            return sint(self.value - other.value)
+        elif isinstance(other, str):
+            return sint(self.value - _sint(other))
+    def __le__(self, other: int|float|str|sint):
+        if isinstance(other, (int, float)):
+            return self.value <= other
+        elif isinstance(other, sint):
+            return self.value <= other.value
+        elif isinstance(other, str):
+            return self.value <= _sint(other)
+    def __lt__(self, other: int|float|str|sint):
+        if isinstance(other, (int, float)):
+            return self.value < other
+        elif isinstance(other, sint):
+            return self.value < other.value
+        elif isinstance(other, str):
+            return self.value < _sint(other)
+    def __ge__(self, other: int|float|str|sint):
+        if isinstance(other, (int, float)):
+            return self.value >= other
+        elif isinstance(other, sint):
+            return self.value >= other.value
+        elif isinstance(other, str):
+            return self.value >= _sint(other)
+    def __gt__(self, other: int|float|str|sint):
+        if isinstance(other, (int, float)):
+            return self.value > other
+        elif isinstance(other, sint):
+            return self.value > other.value
+        elif isinstance(other, str):
+            return self.value > _sint(other)
+    def __eq__(self, other: int|float|str|sint):
+        if isinstance(other, (int, float)):
+            return self.value == other
+        elif isinstance(other, sint):
+            return self.value == other.value
+        elif isinstance(other, str):
+            return self.value == _sint(other)
     def __int__(self):
         return self.value
     def __set__(self, instance, value: int|float|str):
         self.value = _sint(value)
     def __get__(self, instance, owner):
         return self.value
+    def __str__(self):
+        return str(self.value)
+    def __format__(self, format_spec):
+        return self.format_abbrev(self.value)
+    @staticmethod
+    def check(num):
+        if isinstance(num, int):
+            return True
+        if isinstance(num, str):
+            if SINT_NUMBER.fullmatch(num):
+                return True
+        return False
+    @staticmethod
+    def format_abbrev(num: int|float|str):
+        if isinstance(num, str):
+            num = _sint(num)
+        if num >= 100000000:
+            if num % 1000000 == 0:
+                return f"{num/100000000}e"
+        if num >= 10000:
+            if num %10000 == 0:
+                return f"{num/10000}w"
+        return str(num)
 
 def _sint(value: str) -> int:
     if isinstance(value, int):
@@ -72,11 +135,13 @@ def _sint(value: str) -> int:
     if isinstance(value, str):
         if r:=SINT_NUMBER.fullmatch(value):
             num = Decimal(r.groups()[0])
-            if "k" in value:
+            if "k" in value or "K" in value:
                 num *= Decimal("1000")
-            if "w" in value:
+            if "w" in value or "W" in value:
                 num *= Decimal("10000")
-            if "e" in value:
+            if "m" in value or "M" in value:
+                num *= Decimal("1000000")
+            if "e" in value or "E" in value:
                 num *= Decimal("100000000")
             return int(num)
     raise ValueError("输入的数字有误")

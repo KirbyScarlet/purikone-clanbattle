@@ -121,17 +121,17 @@ async def report(group_id: str, user_id: str, args: Namespace):
         return [{"text": "您没有补偿刀"}]
     # 检查伤害数字是否合法
     try:
-        damage = sint(args.damage).value
+        damage = sint(args.damage)
     except ValueError:
         return [{"text": "伤害数值格式错误\n数值格式：\n  数字，数字k，数字w，数字e\n  20000000，2000w，2kw，0.2e"}]
     # 检查当前boss是否可挑战
     bosshp = await get_currenthp(group_id, (args.n or _b))
-    if bosshp == 0:
+    if bosshp.value == 0:
         return [{"text": "该首领无法挑战，请检查出刀记录"}]
     # 结算伤害
-    if bosshp - damage <= 0:
+    if bosshp.value - damage.value <= 0:
         return [{"text": "伤害超出当前首领血量，请重新报刀，并使用命令 尾刀 [首领编号] [补(b)]"}]
-    current_bosshp = bosshp-damage
+    current_bosshp = bosshp - damage
     turn = await get_turn(group_id, boss_id)
     await update_bosshp(group_id, boss_id, user_id, turn, current_bosshp)
     await update_history(group_id, boss_id, user_id, turn, damage, 0, int(bool(args.b)))
